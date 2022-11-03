@@ -1,5 +1,5 @@
 from datetime import datetime
-from functools import lru_cache
+from functools import cache
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -17,18 +17,18 @@ async def db_create_url(url, session: AsyncSession = Depends(get_session)):
                     is_active=True)
     return await save(query, session)
 
-@lru_cache(maxsize=16)
+@cache
 async def db_get_url_by_key(url_key, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(URLInfo).where(URLInfo.key == url_key))
-    one_val = result.scalars().one()
-    return one_val
+    query = await session.execute(select(URLInfo).where(URLInfo.key == url_key))
+    result = query.scalars().one()
+    return result
 
 
 async def db_deactivate_url(url_key, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(URLInfo).where(URLInfo.key == url_key))
-    query = result.scalars().one()
-    query.is_active = False
-    return await save(query=query, session=session)
+    query = await session.execute(select(URLInfo).where(URLInfo.key == url_key))
+    result = query.scalars().one()
+    result.is_active = False
+    return await save(query=result, session=session)
 
 
 async def save(query, session: AsyncSession = Depends(get_session)):
