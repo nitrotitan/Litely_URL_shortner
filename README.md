@@ -21,10 +21,21 @@ The things you need before installing the software.
 A step by step guide that will tell you how to get the development environment up and running on you local system
 
 ```
-$ Install all the requirements from requirement.txt file
-$ Once all the installation has been completed, setup an virtual env on local
-$ Run the file name manage.py, this will create an initialization and migration folder in you directory named as 'migration'
-$ Once above steps is completed run the app using command uvicorn command with reload as argument so you dont have run the command again and again in development 
+Install all the requirements from requirement.txt file
+$ #To install all requirements do 
+$ pip install -r requirement.txt
+
+Once all the installation has been completed, setup an virtual env on local
+$ python3 -m venv "my_env_name"
+
+Run the file name manage.py, this will create an initialization and migration 
+folder in your directory named as 'migration'
+$ python manage.py   # this will setup your migrations
+
+
+Once above steps is completed run the app using command uvicorn command with reload
+as argument so you dont have run the command again and again in development 
+
 ```
 
 ## Usage
@@ -32,10 +43,11 @@ $ Once above steps is completed run the app using command uvicorn command with r
 A few examples of useful commands and/or tasks.
 
 ```
-$ #To install all requirements do 
-$ pip install -r requirement.txt
-$ python manage.py # this will setup your migrations
-$ uvicorn your_app_name.main:app --reload  # this will run the app and also create a DB named 'shorter-url.db'
+
+
+
+$ # below line will run the app and also create a DB named 'shorter-url.db'
+$ uvicorn your_app_name.main:app --reload 
 ```
 
 ## Deployment
@@ -56,3 +68,4 @@ will add later
 * I'm too tired to add
 * please do a bit of research 
 * and most important dont bug me, cause as i said im not paid enough
+
