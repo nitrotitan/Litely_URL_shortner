@@ -14,7 +14,6 @@ from app.models import URLBase
 from app.service.crud import db_create_url, db_get_url_by_key, db_deactivate_url
 from exceptions import raise_bad_request
 
-# noinspection PyInterpreter
 app = FastAPI()
 
 origins = ["*"]
