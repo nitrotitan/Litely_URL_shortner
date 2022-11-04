@@ -1,17 +1,20 @@
 #
-FROM python:3.11.0-slim-buster
+FROM python:3.10.8-slim-buster
 
 #
-WORKDIR root/
+WORKDIR /litely
 
 #
-COPY ./requirements.txt /root /requirements.txt
+COPY ./requirements.txt ./litely/requirements.txt
 
 #
-RUN pip install --no-cache-dir --upgrade -r /root/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r ./litely/requirements.txt
 
 #
-COPY ./app /root /app
-
+COPY ./migrations ./litely/migrations
 #
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["python"," manage.py","-db", "migrate"]
+#
+CMD ["python"," manage.py","-db", "upgrade"]
+#
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0","--proxy-headers", "--port", "80"]
