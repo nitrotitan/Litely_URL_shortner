@@ -9,10 +9,16 @@ psr.add_argument(
     help="this contains command that will init, migrate and upgrade your db",
     required=True
 )
+psr.add_argument(
+    "-m", "--message",
+    help="add your message, you might have left it like your brain",
+    required=True,
+    type=str
+)
 
 
-def migrate():
-    revision_ = "alembic revision --autogenerate -m \"init\" "
+def migrate(message="init"):
+    revision_ = "alembic revision --autogenerate -m {}".format(message)
     os.system(revision_)
 
 
@@ -29,7 +35,7 @@ def init():
 args = psr.parse_args()
 if __name__ == '__main__':
     if args.option == 'migrate':
-        migrate()
+        migrate(message=args.message)
     elif args.option == 'upgrade':
         upgrade()
     elif args.option == 'init':

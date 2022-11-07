@@ -1,5 +1,6 @@
 import logging
 
+import aioredis
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
@@ -21,3 +22,8 @@ async def get_session() -> AsyncSession:
             yield session
         except ConnectionError as e:
             logging.error("Error in Creating Async Session {}".format(e), exc_info=True)
+
+
+def create_redis_pool():
+    redis = aioredis.from_url("redis://localhost", decode_responses=True, encoding="utf-8")
+    return redis

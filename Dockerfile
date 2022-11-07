@@ -6,19 +6,18 @@ WORKDIR /litely
 
 #
 COPY ./requirements.txt /litely/requirements.txt
-
+COPY ./app /litely/app
 #
 RUN pip install --no-cache-dir --upgrade -r /litely/requirements.txt
 
 #
-COPY ./migrations /litely/migrations
-COPY ./alembic.ini /litely/alembic.ini
-COPY ./manage.py /litely/manage.py
-COPY ./shorter-url.db /litely/shorter-url.db
-COPY ./app /litely/app
-#
+ADD ./migrations /litely/migrations
+ADD ./alembic.ini /litely/alembic.ini
+ADD ./manage.py /litely/manage.py
+
 #
 
-#CMD ["python","manage.py","-db","migrate"]
-#CMD ["python","manage.py","-db","upgrade"]
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0","--proxy-headers", "--port", "80"]
+#
+EXPOSE 8080
+#
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2700"]

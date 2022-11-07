@@ -4,7 +4,7 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    env_name: str = "Local"
+    env_name: str = "Production"
     base_url: str = "http://localhost:8000"
     db_url: str = "sqlite+aiosqlite:///./shorter-url.db"
 
