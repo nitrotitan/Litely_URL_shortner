@@ -9,7 +9,6 @@ COPY ./requirements.txt /litely/requirements.txt
 COPY ./app /litely/app
 #
 RUN pip install --no-cache-dir --upgrade -r /litely/requirements.txt
-
 #
 ADD ./migrations /litely/migrations
 ADD ./alembic.ini /litely/alembic.ini

@@ -2,12 +2,11 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from fastapi_limiter import FastAPILimiter
 from starlette.middleware.cors import CORSMiddleware
 
-from .routers import users, redirection
+from .database import init_db
 from .routers import urls
-from .database import init_db, create_redis_pool
+from .routers import users, redirection
 
 app = FastAPI()
 
