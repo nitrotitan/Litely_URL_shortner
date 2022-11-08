@@ -1,8 +1,10 @@
 import logging
+import time
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 
 from .database import init_db
 from .routers import urls
@@ -19,10 +21,6 @@ app.add_middleware(CORSMiddleware,
                    allow_headers=["*"]
                    )
 
-app.include_router(urls.router)
-app.include_router(users.router)
-app.include_router(redirection.router)
-
 
 @app.on_event("startup")
 async def on_startup():
@@ -35,6 +33,15 @@ async def on_startup():
 @app.on_event("shutdown")
 def shutdown():
     logging.info(msg='Server Shutting down')
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 
 def openapi():
@@ -54,3 +61,7 @@ def openapi():
 
 
 app.openapi = openapi
+
+app.include_router(urls.router)
+app.include_router(users.router)
+app.include_router(redirection.router)

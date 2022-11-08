@@ -60,7 +60,7 @@ async def peek(url_key, request: Request, session: AsyncSession = Depends(get_se
 async def get_all_url(request: Request, session: AsyncSession = Depends(get_session)):
     results = await db_get_all_url(session=session)
     if not results:
-        return {}
+        return []
     return [URLBase(target_url=result.target_url, key=result.key, created_on=result.created_on,
                     is_active=result.is_active) for result in results]
 

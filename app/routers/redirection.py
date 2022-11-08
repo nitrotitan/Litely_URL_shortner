@@ -15,7 +15,6 @@ router = APIRouter(tags=['Redirection'])
             summary='Redirects to url')
 async def forward_to_destination(url_key, request: Request, session: AsyncSession = Depends(get_session)):
     result = await db_get_url_by_key(url_key, session)
-    print(result)
     if result is not None:
         if not result.is_active:
             raise raise_url_not_found(request)
