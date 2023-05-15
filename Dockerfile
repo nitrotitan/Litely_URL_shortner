@@ -10,6 +10,7 @@ COPY ./manage.py /litely/manage.py
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r /litely/requirements.txt
+RUN python /litely/app/service/setup.py build_ext --inplace
 
 EXPOSE 8080
 
