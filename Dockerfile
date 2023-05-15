@@ -6,10 +6,10 @@ COPY ./app /litely/app
 COPY ./migrations /litely/migrations
 COPY ./alembic.ini /litely/alembic.ini
 COPY ./manage.py /litely/manage.py
-COPY ./app/service/setup.py /litely/app/service/setup.py
 
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r /litely/requirements.txt \
+    && pip install --no-cache-dir -r /litely/requirements.txt
+RUN python -m pip install --no-cache-dir cython \
     && python /litely/app/service/setup.py build_ext --inplace
 
 EXPOSE 8080

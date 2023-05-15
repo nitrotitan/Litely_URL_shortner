@@ -3,8 +3,8 @@ from Cython.Build import cythonize
 
 extensions = [
     Extension(
-        "key_generator",
-        ["key_generator.pyx"],
+        "app.service.key_generator",
+        ["app/service/key_generator.pyx"],
     )
 ]
 
