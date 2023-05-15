@@ -11,6 +11,8 @@ from app.models import URLInfo  # imported here !
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+from app.database import create_db_url
+
 config = context.config
 
 # Interpret the config file for Python logging.
@@ -27,8 +29,8 @@ target_metadata = SQLModel.metadata  # this has been changed to fit the need !
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+config.set_main_option("sqlalchemy.url", create_db_url())
+# ... etc.x
 
 
 # Please don't change anything from this file if you're dumb af, it's very hard to debug

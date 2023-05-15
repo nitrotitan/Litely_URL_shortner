@@ -1,5 +1,4 @@
 from datetime import datetime
-from functools import cache
 from fastapi import Depends
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,14 +6,14 @@ from sqlalchemy.future import select
 
 from app.database import get_session
 from app.models import URLInfo
-from app.service.keygen import create_random_key
+from app.service.keygen import generate_key
 
 now = datetime.now()
 current_date_time = now.strftime("%d/%m/%y %H:%M:%S")
 
 
 async def db_create_url(url, session: AsyncSession = Depends(get_session)):
-    query = URLInfo(target_url=url.target_url, key=create_random_key(), created_on=current_date_time,
+    query = URLInfo(target_url=url.target_url, key=generate_key(url), created_on=current_date_time,
                     is_active=True)
     result = await save(query, session)
     if result:

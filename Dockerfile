@@ -15,8 +15,8 @@ ADD ./alembic.ini /litely/alembic.ini
 ADD ./manage.py /litely/manage.py
 
 #
-
+RUN /litely/app/service/setup.py build_ext --inplace
 #
 EXPOSE 8080
 #
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2700"]
+CMD ["uvicorn", "app.main:fast", "--host", "0.0.0.0", "--port", "2700"]

@@ -30,3 +30,5 @@ class URLTarget(SQLModel):
 
 class URLKey(SQLModel):
     key: str
+
+

@@ -1,41 +1,37 @@
+import asyncio
 import logging
 import time
+from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
+from starlette.responses import Response
 
-from .database import init_db
-from .routers import urls
-from .routers import users, redirection
+from app.database import init_db
+from app.routers import urls
+from app.service.middleware import DURATION, last_request_time, batch_processing_task, rate_limiter
 
-app = FastAPI()
+fast = FastAPI()
 
 origins = ["*"]
 
-app.add_middleware(CORSMiddleware,
-                   allow_origins=origins,
-                   allow_credentials=True,
-                   allow_methods=["*"],
-                   allow_headers=["*"]
-                   )
+fast.add_middleware(CORSMiddleware,
+                    allow_origins=origins,
+                    allow_credentials=True,
+                    allow_methods=["*"],
+                    allow_headers=["*"]
+                    )
 
 
-@app.on_event("startup")
-async def on_startup():
-    await init_db()
-    # redis = create_redis_pool()
-    # await FastAPILimiter.init(redis)
-    logging.info(msg='Initialized Databases')
+@fast.middleware("http")
+async def rate_limiter_middleware(request: Request, call_next):
+    return await rate_limiter(request, call_next)
 
 
-@app.on_event("shutdown")
-def shutdown():
-    logging.info(msg='Server Shutting down')
-
-
-@app.middleware("http")
+@fast.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
@@ -44,24 +40,38 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+@fast.on_event("startup")
+async def on_startup():
+    await init_db()
+    logging.info(msg='Initialized Databases')
+    asyncio.create_task(batch_processing_task())
+    print("Batch Processing Initialized")
+
+
+@fast.on_event("shutdown")
+def shutdown():
+    logging.info(msg='Server Shutting down')
+
+
 def openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
+    if fast.openapi_schema:
+        return fast.openapi_schema
     openapi_schema = get_openapi(
         title="Litely: URL shortener!",
         version="1.2.1",
         description="This is an API docs for URL shortner",
-        routes=app.routes,
+        routes=fast.routes,
     )
     openapi_schema["info"]["x-logo"] = {
         "url": "https://verloop.io/wp-content/themes/verloop/images/VerloopLogo.svg"
     }
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
+    fast.openapi_schema = openapi_schema
+    return fast.openapi_schema
 
 
-app.openapi = openapi
+fast.openapi = openapi
+from app.routers import users, redirection
 
-app.include_router(urls.router)
-app.include_router(users.router)
-app.include_router(redirection.router)
+fast.include_router(urls.router)
+fast.include_router(users.router)
+fast.include_router(redirection.router)
