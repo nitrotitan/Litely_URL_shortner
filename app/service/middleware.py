@@ -6,8 +6,8 @@ from fastapi import Request
 from starlette.responses import JSONResponse
 
 RATE_LIMIT = 10
-DURATION = timedelta(minutes=1)
-BATCH_DURATION = timedelta(seconds=10)
+DURATION = timedelta(seconds=10)
+BATCH_DURATION = timedelta(seconds=15)
 NUM_SHARDS = 5
 
 request_counts = [PriorityQueue() for _ in range(NUM_SHARDS)]

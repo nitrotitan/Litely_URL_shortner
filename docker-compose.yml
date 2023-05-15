@@ -4,5 +4,3 @@ services:
     build: .
     ports:
       - "2700:2700"
-    volumes:
-      - "./local-db/shorter-url.db"

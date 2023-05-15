@@ -1,18 +1,15 @@
 import asyncio
 import logging
 import time
-from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from fastapi.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import Response
 
 from app.database import init_db
 from app.routers import urls
-from app.service.middleware import DURATION, last_request_time, batch_processing_task, rate_limiter
+from app.service.middleware import batch_processing_task, rate_limiter
 
 fast = FastAPI()
 
@@ -26,9 +23,9 @@ fast.add_middleware(CORSMiddleware,
                     )
 
 
-@fast.middleware("http")
-async def rate_limiter_middleware(request: Request, call_next):
-    return await rate_limiter(request, call_next)
+# @fast.middleware("http")
+# async def rate_limiter_middleware(request: Request, call_next):
+#     return await rate_limiter(request, call_next)
 
 
 @fast.middleware("http")
@@ -44,8 +41,8 @@ async def add_process_time_header(request: Request, call_next):
 async def on_startup():
     await init_db()
     logging.info(msg='Initialized Databases')
-    asyncio.create_task(batch_processing_task())
-    print("Batch Processing Initialized")
+    # asyncio.create_task(batch_processing_task())
+    # print("Batch Processing Initialized")
 
 
 @fast.on_event("shutdown")
