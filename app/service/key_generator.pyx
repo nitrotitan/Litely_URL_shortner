@@ -1,6 +1,8 @@
 from libc.stdlib cimport malloc, free
 from libc.string cimport memcpy
 from cpython.bytes cimport PyBytes_FromStringAndSize
+from libc.stdlib cimport rand
+
 
 cdef char[63] alphanum
 
@@ -40,20 +42,14 @@ def generate_key(str url):
 
 def generate_random_key():
     cdef int i
-    cdef char* random_hash
-    cdef char* result
-
-    # Initialize the random_hash array using malloc
-    random_hash = <char*>malloc(9)
+    cdef char random_hash[9]
+    cdef str result
 
     for i in range(8):
         random_hash[i] = alphanum[rand() % 62]
 
     random_hash[8] = b'\0'
 
-    result_bytes = PyBytes_FromStringAndSize(random_hash, 8)
-    result = result_bytes.decode()
-
-    free(random_hash)
+    result = random_hash.decode()
 
     return result
