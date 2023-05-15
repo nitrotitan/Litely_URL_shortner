@@ -13,8 +13,19 @@ current_date_time = now.strftime("%d/%m/%y %H:%M:%S")
 
 
 async def db_create_url(url, session: AsyncSession = Depends(get_session)):
-    query = URLInfo(target_url=url.target_url, key=generate_key(url), created_on=current_date_time,
-                    is_active=True)
+    deterministic_key = generate_key(url)
+    query = await session.execute(select(URLInfo).where(URLInfo.key == deterministic_key))
+    try:
+        result = query.scalars().one()
+
+    except SQLAlchemyError:
+        return None
+
+    if query:
+        return result.key
+    else:
+        query = URLInfo(target_url=url.target_url, key=deterministic_key, created_on=current_date_time,
+                        is_active=True)
     result = await save(query, session)
     if result:
         return result.key

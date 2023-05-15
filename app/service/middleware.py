@@ -8,7 +8,7 @@ from starlette.responses import JSONResponse
 RATE_LIMIT = 10
 DURATION = timedelta(minutes=1)
 BATCH_DURATION = timedelta(seconds=10)
-NUM_SHARDS = 10
+NUM_SHARDS = 5
 
 request_counts = [PriorityQueue() for _ in range(NUM_SHARDS)]
 last_request_time = [{} for _ in range(NUM_SHARDS)]
@@ -111,7 +111,7 @@ def get_accumulated_batch() -> List[Tuple[str, int]]:
 async def batch_processing_task():
     while True:
         batch = get_accumulated_batch()
-        print("Batch processing started")
+        print("Batch processing Running")
         if batch:
             process_batch_requests(batch)
         await asyncio.sleep(BATCH_DURATION.total_seconds())

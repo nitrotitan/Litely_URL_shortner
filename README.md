@@ -4,10 +4,7 @@ A url shortner with FastAPI framework.
 
 ## Getting Started
 
-This app made with async support, all the APIs and even the sqlite DB is running on Async mode,
-might cause some error related to DB connections and Async in that case please dont reach out to me,
-im not paid enough :(
-
+This app made with async support
 ### Prerequisites
 
 The things you need before installing the software.
@@ -63,8 +60,3 @@ will add later
 
 * Master: main
 
-## Additional Documentation and Acknowledgments
-
-* I'm too tired to add
-* please do a bit of research 
-* and most important dont bug me, cause as i said im not paid enough
