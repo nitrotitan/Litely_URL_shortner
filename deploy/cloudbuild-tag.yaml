@@ -1,0 +1,33 @@
+steps:
+
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    docker pull asia.gcr.io/$PROJECT_ID/litely:latest || exit 0
+
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'gs://${PROJECT_ID}_secrets_devops/github-integration/*', '.']
+
+- name: 'asia.gcr.io/$PROJECT_ID/bob:stable'
+  args: ['bash', 'deploy/cloudbuild-commit.sh']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile',
+         '--build-arg', 'VERSION=$TAG_NAME',
+         '-t', 'asia.gcr.io/$PROJECT_ID/webhook-events:$TAG_NAME',
+         '--cache-from', 'asia.gcr.io/$PROJECT_ID/litely:latest',
+         '.']
+
+- name: 'asia.gcr.io/$PROJECT_ID/webhook-events:$COMMIT_SHA'
+  entrypoint: 'python'
+  args:
+  - '-m'
+  - 'pytest'
+
+timeout: 2400s
+logsBucket: verloop-dev_cloudbuild_logs
+
+images:
+- 'asia.gcr.io/$PROJECT_ID/webhook-events:$TAG_NAME'

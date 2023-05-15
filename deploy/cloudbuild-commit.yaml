@@ -1,0 +1,49 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  # this pulls latest version of image from repository to use as cache in Docker build step
+  args:
+  - '-c'
+  - |
+    docker pull asia.gcr.io/$PROJECT_ID/litely:latest || exit 0
+
+# this step copies github secrets credentials and places it in the current build directory
+# without this, build won't be able to access private repositories during the build
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'gs://${PROJECT_ID}_secrets_devops/github-integration/*', '.']
+
+# this runs our `cloudbuild-commit.sh` file using the credentials we copied from the previous step
+# this script generates a `.gitconfig` with temporary token to access Github
+- name: 'asia.gcr.io/$PROJECT_ID/bob:stable'
+  args: ['bash', 'deploy/cloudbuild-commit.sh']
+
+# basically builds the Dockerfile
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', 'Dockerfile',
+         '--build-arg', 'VERSION=$COMMIT_SHA',
+         '-t', 'asia.gcr.io/$PROJECT_ID/litely:$SHORT_SHA',
+         '--cache-from', 'asia.gcr.io/$PROJECT_ID/litely:latest',
+         '.']
+
+# the next 3 steps tag the docker image which we built in the previous step
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'asia.gcr.io/$PROJECT_ID/webhook-events:$SHORT_SHA', 'asia.gcr.io/$PROJECT_ID/webhook-events:$BRANCH_NAME']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'asia.gcr.io/$PROJECT_ID/webhook-events:$SHORT_SHA', 'asia.gcr.io/$PROJECT_ID/webhook-events:$COMMIT_SHA']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['tag', 'asia.gcr.io/$PROJECT_ID/webhook-events:$SHORT_SHA', 'asia.gcr.io/$PROJECT_ID/webhook-events:latest']
+
+
+# if build exceeds following seconds, then it breaks
+timeout: 2400s
+# this specifies where to store the Cloud build logs
+logsBucket: verloop-dev_cloudbuild_logs
+
+# this step pushes the built image to Container Registry
+images:
+- 'asia.gcr.io/$PROJECT_ID/webhook-events:$COMMIT_SHA'
+- 'asia.gcr.io/$PROJECT_ID/webhook-events:$BRANCH_NAME'
+- 'asia.gcr.io/$PROJECT_ID/webhook-events:$SHORT_SHA'
+- 'asia.gcr.io/$PROJECT_ID/webhook-events:latest'
